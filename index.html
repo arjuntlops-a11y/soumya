@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>For Soumya 💖</title>
 
-<!-- Supabase SDK (global = supabase) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 :root {
   --pink:#ff8fb1;
@@ -16,20 +13,17 @@
   --bg2:#ffe4e1;
   --ink:#4b2c2c;
 }
-
 body {
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
   color:var(--ink);
 }
-
 .container {
   max-width:900px;
   margin:auto;
   padding:24px 14px 140px;
 }
-
 .card {
   background:#fff;
   border-radius:22px;
@@ -37,111 +31,42 @@ body {
   box-shadow:0 10px 25px rgba(0,0,0,.08);
   margin:16px 0;
 }
-
-.hero { text-align:center; }
-
-h1,h2 { margin:.4rem 0; }
-
-.mood-row {
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.pill {
-  border:none;
-  cursor:pointer;
-  padding:10px 14px;
-  border-radius:999px;
+.hero{text-align:center}
+.mood-row{display:flex;gap:10px;flex-wrap:wrap}
+.pill{
+  border:none;cursor:pointer;
+  padding:10px 14px;border-radius:999px;
   background:linear-gradient(180deg,var(--pink2),var(--pink));
-  color:#fff;
-  font-weight:700;
+  color:#fff;font-weight:700;
 }
-
-.reply {
-  margin-top:10px;
-  font-style:italic;
+.bucket-input{display:flex;gap:10px}
+.bucket-input input{
+  flex:1;padding:12px;border-radius:12px;border:1px solid #ddd
 }
-
-/* Bucket list */
-.bucket-input {
-  display:flex;
-  gap:10px;
+.bucket-input button{
+  padding:12px 14px;border-radius:12px;border:none;
+  background:var(--pink);color:#fff;font-weight:700
 }
-
-.bucket-input input {
-  flex:1;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #ddd;
+ul{list-style:none;padding:0;margin-top:12px}
+li{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#fff6fa;border-radius:14px;padding:10px 12px;margin:8px 0
 }
-
-.bucket-input button {
-  padding:12px 14px;
-  border-radius:12px;
-  border:none;
-  background:var(--pink);
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
+.done{text-decoration:line-through;opacity:.6}
+.cat{
+  position:fixed;bottom:20px;font-size:44px;cursor:pointer;
 }
-
-ul {
-  list-style:none;
-  padding:0;
-  margin-top:12px;
-}
-
-li {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#fff6fa;
-  border-radius:14px;
-  padding:10px 12px;
-  margin:8px 0;
-}
-
-.done {
-  text-decoration:line-through;
-  opacity:.6;
-}
-
-/* Cats */
-.cat {
-  position:fixed;
-  bottom:20px;
-  font-size:44px;
-  cursor:pointer;
-  user-select:none;
-}
-
-.cat .bubble {
-  position:absolute;
-  bottom:56px;
-  left:50%;
+.cat .bubble{
+  position:absolute;bottom:56px;left:50%;
   transform:translateX(-50%);
-  background:#fff;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  opacity:0;
-  transition:.2s;
-  box-shadow:0 6px 15px rgba(0,0,0,.15);
-  white-space:nowrap;
+  background:#fff;padding:6px 10px;border-radius:999px;
+  font-size:12px;opacity:0;transition:.2s
 }
-
-.cat .bubble.show { opacity:1; }
-
-footer {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
+.cat .bubble.show{opacity:1}
+footer{
+  position:fixed;bottom:0;left:0;right:0;
   background:rgba(255,255,255,.85);
-  text-align:center;
-  padding:12px;
-  font-size:13px;
+  text-align:center;padding:12px;font-size:13px
 }
 </style>
 </head>
@@ -163,7 +88,7 @@ footer {
       <button class="pill" data-mood="tired">Tired 😴</button>
       <button class="pill" data-mood="excited">Excited ✨</button>
     </div>
-    <div class="reply" id="moodReply"></div>
+    <div id="moodReply"></div>
   </div>
 
   <div class="card">
@@ -177,13 +102,12 @@ footer {
 
 </div>
 
-<!-- Cats -->
-<div class="cat" id="cat1" style="left:10%">
+<div class="cat" style="left:10%">
   🐱
   <div class="bubble">hi Soumya 💕</div>
 </div>
 
-<div class="cat" id="cat2" style="left:80%">
+<div class="cat" style="left:80%">
   🐱
   <div class="bubble">purr… 🐾</div>
 </div>
@@ -191,102 +115,73 @@ footer {
 <footer>Made with love 💗</footer>
 
 <script>
-/* ================= SUPABASE ================= */
-const SUPABASE_URL = "https://vzzwibveqcgyblyuaztv.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6endpYnZlcWNneWJseXVhenR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTc3MDUsImV4cCI6MjA4Mzg5MzcwNX0.BVTm-pYfEJQ0XGgaEcFDHRUb4CSvJmsPon3UGAcqwPY";
+/* helper */
+function call(fn, payload) {
+  return fetch(`/.netlify/functions/${fn}`, {
+    method:"POST",
+    body:JSON.stringify(payload)
+  });
+}
 
-/* IMPORTANT: client name is NOT 'supabase' */
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+/* visit log */
+call("log-event",{event_type:"visit",value:"open"});
 
-/* ================= VISIT LOG ================= */
-supabaseClient.from("events").insert({
-  event_type: "visit",
-  value: "open"
-});
-
-/* ================= DAILY MESSAGE ================= */
-const messages = [
+/* daily message */
+const msgs=[
   "You make the world softer just by existing 💖",
   "If smiles were stars, you’d be a galaxy ✨",
-  "You are deeply cherished 💞",
   "A cat somewhere is purring for you 🐾"
 ];
-document.getElementById("dailyMessage").textContent =
-  messages[Math.floor(Math.random()*messages.length)];
+dailyMessage.textContent=msgs[Math.floor(Math.random()*msgs.length)];
 
-/* ================= MOODS ================= */
-const moodReply = {
-  happy: "That smile is adorable 💫",
-  sad: "Soft hugs for you 🤍",
-  tired: "Rest a little, sweetheart 🌙",
-  excited: "Your joy is glowing ✨"
+/* moods */
+const replies={
+  happy:"That smile is adorable 💫",
+  sad:"Soft hugs for you 🤍",
+  tired:"Rest a little 🌙",
+  excited:"Your joy is glowing ✨"
 };
-
-document.querySelectorAll(".pill").forEach(btn => {
-  btn.onclick = () => {
-    const mood = btn.dataset.mood;
-    document.getElementById("moodReply").textContent = moodReply[mood];
-    supabaseClient.from("events").insert({
-      event_type: "mood",
-      value: mood
-    });
+document.querySelectorAll(".pill").forEach(b=>{
+  b.onclick=()=>{
+    moodReply.textContent=replies[b.dataset.mood];
+    call("log-event",{event_type:"mood",value:b.dataset.mood});
   };
 });
 
-/* ================= BUCKET LIST ================= */
-const list = document.getElementById("bucketList");
+/* bucket list */
+bucketAdd.onclick=async()=>{
+  const text=bucketInput.value.trim();
+  if(!text)return;
+  bucketInput.value="";
+  const res=await call("add-bucket",{text});
+  const item=await res.json();
 
-document.getElementById("bucketAdd").onclick = async () => {
-  const input = document.getElementById("bucketInput");
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = "";
-
-  const { data } = await supabaseClient
-    .from("bucket_items")
-    .insert({ text, done:false })
-    .select()
-    .single();
-
-  const li = document.createElement("li");
-  li.innerHTML = `
-    <span>${data.text}</span>
+  const li=document.createElement("li");
+  li.innerHTML=`
+    <span>${item.text}</span>
     <div>
       <button>✔</button>
       <button>✖</button>
     </div>
   `;
-
-  li.children[1].children[0].onclick = () => {
+  li.children[1].children[0].onclick=()=>{
     li.classList.toggle("done");
-    supabaseClient
-      .from("bucket_items")
-      .update({ done: li.classList.contains("done") })
-      .eq("id", data.id);
+    call("update-bucket",{id:item.id,done:li.classList.contains("done")});
   };
-
-  li.children[1].children[1].onclick = () => {
+  li.children[1].children[1].onclick=()=>{
     li.remove();
-    supabaseClient.from("bucket_items").delete().eq("id", data.id);
+    call("delete-bucket",{id:item.id});
   };
-
-  list.appendChild(li);
+  bucketList.appendChild(li);
 };
 
-/* ================= CATS ================= */
-document.querySelectorAll(".cat").forEach(cat => {
-  cat.onclick = () => {
-    const bubble = cat.querySelector(".bubble");
-    bubble.classList.add("show");
-    setTimeout(() => bubble.classList.remove("show"), 2000);
+/* cats */
+document.querySelectorAll(".cat").forEach(c=>{
+  c.onclick=()=>{
+    const b=c.querySelector(".bubble");
+    b.classList.add("show");
+    setTimeout(()=>b.classList.remove("show"),2000);
   };
-
-  setInterval(() => {
-    cat.style.left = Math.random() * (window.innerWidth - 60) + "px";
-  }, 3000);
 });
 </script>
 
