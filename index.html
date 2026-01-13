@@ -8,7 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* --- UI STYLES (unchanged visually) --- */
 :root{
   --pink:#ff8fb1;
   --pink2:#ffd1dc;
@@ -16,49 +15,155 @@
   --bg2:#ffe4e1;
   --ink:#4b2c2c;
 }
+
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
   color:var(--ink);
+  overflow-x:hidden;
 }
-.container{max-width:900px;margin:auto;padding:24px 14px 160px}
+
+/* ================= UI ================= */
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:24px 14px 180px;
+}
+
 .card{
+  position:relative;
+  z-index:20;
   background:#fff;
   border-radius:22px;
   padding:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.08);
   margin:16px 0;
 }
+
 .hero{text-align:center}
+
 h1,h2{margin:.4rem 0}
-.mood-row{display:flex;gap:10px;flex-wrap:wrap}
+
+.mood-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
 .pill{
-  border:none;cursor:pointer;
-  padding:10px 14px;border-radius:999px;
+  border:none;
+  cursor:pointer;
+  padding:10px 14px;
+  border-radius:999px;
   background:linear-gradient(180deg,var(--pink2),var(--pink));
-  color:#fff;font-weight:700;
+  color:#fff;
+  font-weight:700;
 }
-.reply{margin-top:10px;font-style:italic}
-.bucket-input{display:flex;gap:10px}
+
+.reply{
+  margin-top:10px;
+  font-style:italic;
+}
+
+/* Bucket list */
+.bucket-input{
+  display:flex;
+  gap:10px;
+}
+
 .bucket-input input{
-  flex:1;padding:12px;border-radius:12px;border:1px solid #ddd
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  position:relative;
+  z-index:25;
 }
+
 .bucket-input button{
-  padding:12px 14px;border-radius:12px;border:none;
-  background:var(--pink);color:#fff;font-weight:700
+  padding:12px 14px;
+  border-radius:12px;
+  border:none;
+  background:var(--pink);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  position:relative;
+  z-index:25;
 }
-ul{list-style:none;padding:0;margin-top:12px}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin-top:12px;
+}
+
 li{
-  display:flex;justify-content:space-between;align-items:center;
-  background:#fff6fa;border-radius:14px;padding:10px 12px;margin:8px 0
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff6fa;
+  border-radius:14px;
+  padding:10px 12px;
+  margin:8px 0;
 }
-.done{text-decoration:line-through;opacity:.6}
+
+.done{
+  text-decoration:line-through;
+  opacity:.6;
+}
+
 footer{
-  position:fixed;bottom:0;left:0;right:0;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
   background:rgba(255,255,255,.85);
-  text-align:center;padding:12px;font-size:13px
+  text-align:center;
+  padding:12px;
+  font-size:13px;
+  z-index:30;
 }
+
+/* ================= INTERACTION LAYER ================= */
+.stage{
+  position:fixed;
+  inset:0;
+  pointer-events:none; /* IMPORTANT */
+  z-index:10;
+}
+
+.critter{
+  position:absolute;
+  width:80px;
+  height:50px;
+  pointer-events:auto;
+  cursor:pointer;
+  transform:translate(-50%,-50%);
+}
+
+.bubble{
+  position:absolute;
+  bottom:55px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  opacity:0;
+  transition:.2s;
+  box-shadow:0 6px 15px rgba(0,0,0,.15);
+  white-space:nowrap;
+}
+
+.bubble.show{opacity:1}
+
+.sleeping{opacity:.7}
+
+/* Safety */
+input,button{z-index:25;position:relative}
 </style>
 </head>
 
@@ -93,12 +198,12 @@ footer{
 
 </div>
 
+<div class="stage" id="stage"></div>
+
 <footer>Made with love 💗</footer>
 
 <script>
-/* =========================
-   SUPABASE SETUP
-========================= */
+/* ================= SUPABASE ================= */
 const SUPABASE_URL = "https://vzzwibveqcgyblyuaztv.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6endpYnZlcWNneWJseXVhenR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTc3MDUsImV4cCI6MjA4Mzg5MzcwNX0.BVTm-pYfEJQ0XGgaEcFDHRUb4CSvJmsPon3UGAcqwPY";
 
@@ -107,39 +212,24 @@ const supabase = supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
-/* =========================
-   VISIT LOGGING
-========================= */
-(async () => {
-  try {
-    await supabase.from("events").insert({
-      event_type: "visit",
-      value: "page_open"
-    });
-  } catch(e){}
-})();
+/* ================= VISIT ================= */
+supabase.from("events").insert({
+  event_type:"visit",
+  value:"open"
+});
 
-/* =========================
-   DAILY MESSAGE
-========================= */
-const messages = [
+/* ================= DAILY MESSAGE ================= */
+const msgs=[
   "You make the world softer just by existing 💖",
   "If smiles were stars, you’d be a galaxy ✨",
-  "You are deeply cherished 💞",
-  "A cat somewhere is purring for you 🐾"
+  "A cat somewhere is purring for you 🐾",
+  "You are deeply cherished 💞"
 ];
-const today = new Date().toDateString();
-let daily = JSON.parse(localStorage.getItem("dailyMsg")||"{}");
-if(daily.date!==today){
-  daily={date:today,text:messages[Math.floor(Math.random()*messages.length)]};
-  localStorage.setItem("dailyMsg",JSON.stringify(daily));
-}
-document.getElementById("dailyMessage").textContent = daily.text;
+document.getElementById("dailyMessage").textContent =
+  msgs[Math.floor(Math.random()*msgs.length)];
 
-/* =========================
-   MOODS (LOGGED)
-========================= */
-const moodReply = {
+/* ================= MOODS ================= */
+const moodReply={
   happy:"That smile is adorable 💫",
   sad:"Soft hugs for you 🤍",
   tired:"Rest a little, sweetheart 🌙",
@@ -147,81 +237,84 @@ const moodReply = {
 };
 
 document.querySelectorAll(".pill").forEach(btn=>{
-  btn.onclick = async () => {
-    const mood = btn.dataset.mood;
-    document.getElementById("moodReply").textContent = moodReply[mood];
-
-    try {
-      await supabase.from("events").insert({
-        event_type:"mood",
-        value:mood
-      });
-    } catch(e){}
+  btn.onclick=()=>{
+    const mood=btn.dataset.mood;
+    document.getElementById("moodReply").textContent=moodReply[mood];
+    supabase.from("events").insert({
+      event_type:"mood",
+      value:mood
+    });
   };
 });
 
-/* =========================
-   BUCKET LIST (SYNCED)
-========================= */
-const bucketList = document.getElementById("bucketList");
-const bucketInput = document.getElementById("bucketInput");
-
-function renderBucket(id,text,done){
-  const li=document.createElement("li");
-  if(done)li.classList.add("done");
-  li.innerHTML=`
-    <span>${text}</span>
-    <div>
-      <button>✔</button>
-      <button>✖</button>
-    </div>
-  `;
-  li.children[1].children[0].onclick=async()=>{
-    li.classList.toggle("done");
-    await supabase.from("bucket_items")
-      .update({done:li.classList.contains("done")})
-      .eq("id",id);
-  };
-  li.children[1].children[1].onclick=async()=>{
-    li.remove();
-    await supabase.from("bucket_items").delete().eq("id",id);
-  };
-  bucketList.appendChild(li);
-}
-
-async function loadBuckets(){
-  const {data}=await supabase.from("bucket_items").select("*").order("created_at");
-  data?.forEach(b=>renderBucket(b.id,b.text,b.done));
-}
-loadBuckets();
-
+/* ================= BUCKET ================= */
+const list=document.getElementById("bucketList");
 document.getElementById("bucketAdd").onclick=async()=>{
-  const text=bucketInput.value.trim();
+  const input=document.getElementById("bucketInput");
+  const text=input.value.trim();
   if(!text)return;
-  bucketInput.value="";
+  input.value="";
   const {data}=await supabase
     .from("bucket_items")
     .insert({text,done:false})
     .select()
     .single();
-  renderBucket(data.id,data.text,data.done);
+
+  const li=document.createElement("li");
+  li.innerHTML=`<span>${data.text}</span>
+    <div>
+      <button>✔</button>
+      <button>✖</button>
+    </div>`;
+  li.children[1].children[0].onclick=()=>{
+    li.classList.toggle("done");
+    supabase.from("bucket_items")
+      .update({done:li.classList.contains("done")})
+      .eq("id",data.id);
+  };
+  li.children[1].children[1].onclick=()=>{
+    li.remove();
+    supabase.from("bucket_items").delete().eq("id",data.id);
+  };
+  list.appendChild(li);
 };
 
-/* =========================
-   NOTE FOR YOU
-========================= */
-/*
-You can now see EVERYTHING Soumya does in Supabase:
+/* ================= CRITTERS ================= */
+const stage=document.getElementById("stage");
 
-- Table: events
-  - visit
-  - mood
-- Table: bucket_items
-  - text
-  - done
+function createCat(){
+  const c=document.createElement("div");
+  c.className="critter";
+  c.innerHTML=`
+    🐱
+    <div class="bubble">hi Soumya 💕</div>
+  `;
+  stage.appendChild(c);
 
-This is real backend data.
-*/
+  let x=Math.random()*window.innerWidth;
+  let y=window.innerHeight-120;
+
+  setInterval(()=>{
+    x+=Math.random()*120-60;
+    x=Math.max(40,Math.min(window.innerWidth-40,x));
+    c.style.left=x+"px";
+    c.style.top=y+"px";
+  },2500);
+
+  c.onclick=()=>{
+    const b=c.querySelector(".bubble");
+    b.classList.add("show");
+    setTimeout(()=>b.classList.remove("show"),2000);
+  };
+}
+
+createCat();
+createCat();
+
+/* ================= DEBUG CLICK ================= */
+document.body.addEventListener("click",()=>{
+  console.log("Body click detected");
+});
 </script>
 
 </body>
