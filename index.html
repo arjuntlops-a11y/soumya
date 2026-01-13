@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>For Soumya 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --pink: #ffb6c1;
+  --soft-pink: #fff0f5;
+  --text-dark: #4b2c2c;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", system-ui, sans-serif;
+  background: linear-gradient(180deg, #fff0f5, #ffe4e1);
+  color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem 1rem 7rem;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+
+.hero { text-align: center; }
+
+h1, h2 { margin: 0.5rem 0; }
+
+.message { font-size: 1.1rem; margin-top: 1rem; }
+
+/* Mood */
+.mood-buttons button {
+  margin: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: var(--pink);
+  color: white;
+  font-weight: 600;
+}
+
+.response { margin-top: 1rem; font-style: italic; }
+
+/* Bucket list */
+.bucket-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bucket-input input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.bucket-input button {
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: var(--pink);
+  color: white;
+  cursor: pointer;
+}
+
+ul { list-style: none; padding: 0; }
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--soft-pink);
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+}
+
+li span.done {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Cats */
+.cat {
+  position: fixed;
+  bottom: 20px;
+  width: 60px;
+  cursor: pointer;
+  z-index: 50;
+  transition: transform 0.4s;
+}
+
+.cat.sleeping {
+  transform: scale(0.95);
+  filter: grayscale(20%);
+}
+
+/* Chat bubble */
+.bubble {
+  position: absolute;
+  bottom: 70px;
+  left: -10px;
+  background: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.bubble.show { opacity: 1; }
+
+/* Fish */
+.fish {
+  position: fixed;
+  top: 30%;
+  width: 50px;
+  cursor: pointer;
+  animation: float 4s ease-in-out infinite;
+  z-index: 40;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 0.8rem;
+  background: rgba(255,255,255,0.85);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card hero">
+    <h1>Hey Soumya 💕</h1>
+    <div class="message" id="dailyMessage"></div>
+  </div>
+
+  <div class="card">
+    <h2>How are you cutiee? 🥰</h2>
+    <div class="mood-buttons">
+      <button onclick="respond('happy')">Happy 😊</button>
+      <button onclick="respond('sad')">Sad 🥺</button>
+      <button onclick="respond('tired')">Tired 😴</button>
+      <button onclick="respond('excited')">Excited ✨</button>
+    </div>
+    <div class="response" id="moodResponse"></div>
+  </div>
+
+  <div class="card">
+    <h2>Our Cute Bucket List 🐾</h2>
+    <div class="bucket-input">
+      <input id="bucketInput" placeholder="Add something sweet..." />
+      <button onclick="addBucket()">Add</button>
+    </div>
+    <ul id="bucketList"></ul>
+  </div>
+</div>
+
+<!-- Cats -->
+<div class="cat" id="cat1">
+  <img src="https://i.imgur.com/QZ7QZ9p.png" width="60">
+  <div class="bubble"></div>
+</div>
+
+<div class="cat" id="cat2">
+  <img src="https://i.imgur.com/1X7qZQp.png" width="60">
+  <div class="bubble"></div>
+</div>
+
+<img src="https://i.imgur.com/6YVYF5Y.png" class="fish" id="fish" />
+
+<footer>Made with love 💗</footer>
+
+<script>
+/* Daily message */
+const messages = [
+  "You make the world softer just by existing 💕",
+  "If smiles were stars, you’d be a galaxy ✨",
+  "Hey Soumya, today looks better because of you 🌸",
+  "You are deeply cherished 💖",
+  "A cat smiled thinking of you 🐱"
+];
+
+const today = new Date().toDateString();
+const storedMsg = JSON.parse(localStorage.getItem("dailyMessage") || "{}");
+
+if (storedMsg.date !== today) {
+  localStorage.setItem("dailyMessage", JSON.stringify({
+    date: today,
+    text: messages[Math.floor(Math.random() * messages.length)]
+  }));
+}
+
+document.getElementById("dailyMessage").textContent =
+  JSON.parse(localStorage.getItem("dailyMessage")).text;
+
+/* Mood */
+function respond(mood) {
+  const map = {
+    happy: "That smile is adorable 💫",
+    sad: "Soft hugs for you 🤍",
+    tired: "Rest a bit, sweet soul 🌙",
+    excited: "Your joy is glowing ✨"
+  };
+  document.getElementById("moodResponse").textContent = map[mood];
+}
+
+/* Bucket list persistence */
+const bucketList = document.getElementById("bucketList");
+
+function saveBuckets() {
+  const data = [...bucketList.children].map(li => ({
+    text: li.querySelector("span").textContent,
+    done: li.querySelector("span").classList.contains("done")
+  }));
+  localStorage.setItem("bucketList", JSON.stringify(data));
+}
+
+function loadBuckets() {
+  const data = JSON.parse(localStorage.getItem("bucketList") || "[]");
+  data.forEach(item => {
+    createBucket(item.text, item.done);
+  });
+}
+
+function createBucket(text, done=false) {
+  const li = document.createElement("li");
+  const span = document.createElement("span");
+  span.textContent = text;
+  if (done) span.classList.add("done");
+
+  const controls = document.createElement("div");
+
+  const ok = document.createElement("button");
+  ok.textContent = "✔";
+  ok.onclick = () => { span.classList.toggle("done"); saveBuckets(); };
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => { li.remove(); saveBuckets(); };
+
+  controls.append(ok, del);
+  li.append(span, controls);
+  bucketList.appendChild(li);
+}
+
+function addBucket() {
+  const input = document.getElementById("bucketInput");
+  if (!input.value.trim()) return;
+  createBucket(input.value);
+  input.value = "";
+  saveBuckets();
+}
+
+loadBuckets();
+
+/* Cat logic */
+const catPhrases = [
+  "meow 💕",
+  "hi Soumya 🐾",
+  "nap time?",
+  "you’re loved",
+  "purr..."
+];
+
+document.querySelectorAll(".cat").forEach(cat => {
+  let x = Math.random() * (window.innerWidth - 60);
+  let sleeping = false;
+
+  cat.style.left = x + "px";
+
+  const bubble = cat.querySelector(".bubble");
+
+  function speak() {
+    bubble.textContent = catPhrases[Math.floor(Math.random() * catPhrases.length)];
+    bubble.classList.add("show");
+    setTimeout(() => bubble.classList.remove("show"), 2000);
+  }
+
+  function sleepCycle() {
+    sleeping = true;
+    cat.classList.add("sleeping");
+    speak();
+    setTimeout(() => {
+      sleeping = false;
+      cat.classList.remove("sleeping");
+      speak();
+    }, 5000 + Math.random() * 5000);
+  }
+
+  setInterval(() => {
+    if (sleeping) return;
+    x += (Math.random() > 0.5 ? 1 : -1) * 80;
+    x = Math.max(0, Math.min(window.innerWidth - 60, x));
+    cat.style.left = x + "px";
+    if (Math.random() > 0.7) speak();
+    if (Math.random() > 0.85) sleepCycle();
+  }, 3000);
+
+  cat.onclick = () => {
+    sleeping = false;
+    cat.classList.remove("sleeping");
+    speak();
+  };
+});
+
+/* Fish */
+const fish = document.getElementById("fish");
+fish.onclick = () => alert("Blub blub 🐟");
+</script>
+
+</body>
+</html>
