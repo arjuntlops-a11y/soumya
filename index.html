@@ -2,340 +2,745 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>For Soumya 💖</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-:root {
-  --pink: #ffb6c1;
-  --soft-pink: #fff0f5;
-  --text-dark: #4b2c2c;
-}
+  :root{
+    --pink:#ff8fb1;
+    --pink2:#ffd1dc;
+    --bg1:#fff0f5;
+    --bg2:#ffe4e1;
+    --ink:#4b2c2c;
+    --card:#ffffff;
+    --soft:#fff6fa;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    color:var(--ink);
+    background:linear-gradient(180deg,var(--bg1),var(--bg2));
+    overflow-x:hidden;
+  }
 
-body {
-  margin: 0;
-  font-family: "Poppins", system-ui, sans-serif;
-  background: linear-gradient(180deg, #fff0f5, #ffe4e1);
-  color: var(--text-dark);
-  overflow-x: hidden;
-}
+  .container{max-width:960px;margin:0 auto;padding:24px 14px 160px;}
+  .card{
+    background:var(--card);
+    border-radius:22px;
+    padding:18px 18px 16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    margin:16px auto;
+    position:relative;
+  }
+  .hero{ text-align:center; padding:22px 18px; }
+  h1{margin:0;font-size:2.1rem}
+  h2{margin:0 0 10px 0;font-size:1.25rem}
+  .sub{margin-top:8px;font-size:1.05rem}
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem 1rem 7rem;
-}
+  /* subtle interactive glow on cards */
+  .card::after{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:22px;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .2s;
+    background:radial-gradient(600px 200px at var(--mx,50%) var(--my,30%), rgba(255,143,177,.25), transparent 60%);
+  }
+  .card:hover::after{opacity:1}
 
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  margin-bottom: 2rem;
-}
+  /* mood */
+  .mood-row{display:flex;flex-wrap:wrap;gap:10px}
+  .pill{
+    border:none; cursor:pointer;
+    padding:10px 14px;
+    border-radius:999px;
+    background:linear-gradient(180deg,var(--pink2),var(--pink));
+    color:#fff; font-weight:700;
+    box-shadow:0 6px 16px rgba(255,143,177,.25);
+    transition:transform .08s ease;
+  }
+  .pill:active{transform:scale(.98)}
+  .reply{margin-top:10px;font-style:italic;min-height:22px}
 
-.hero { text-align: center; }
+  /* bucketlist */
+  .bucket-input{display:flex;gap:10px;align-items:center}
+  .bucket-input input{
+    flex:1;
+    padding:12px 12px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,.12);
+    outline:none;
+    background:#fff;
+  }
+  .bucket-input button{
+    padding:12px 14px;
+    border-radius:12px;
+    border:none;
+    background:var(--pink);
+    color:#fff;
+    font-weight:800;
+    cursor:pointer;
+  }
+  ul{list-style:none;padding:0;margin:12px 0 0}
+  li{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--soft);
+    border:1px solid rgba(0,0,0,.05);
+    padding:10px 12px;
+    border-radius:14px;
+    margin:8px 0;
+    gap:12px;
+  }
+  .left{display:flex;align-items:center;gap:10px;min-width:0}
+  .chk{
+    width:22px;height:22px;border-radius:7px;
+    border:2px solid rgba(75,44,44,.25);
+    display:grid;place-items:center;
+    background:#fff;
+    cursor:pointer;
+  }
+  .txt{
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .done .txt{text-decoration:line-through;opacity:.6}
+  .actions{display:flex;gap:8px}
+  .mini{
+    border:none; cursor:pointer;
+    padding:8px 10px;border-radius:10px;
+    background:#fff;
+    border:1px solid rgba(0,0,0,.10);
+  }
 
-h1, h2 { margin: 0.5rem 0; }
+  /* "water" band for fish */
+  .water{
+    position:fixed; left:0; right:0; bottom:62px;
+    height:120px;
+    background:linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.65));
+    backdrop-filter: blur(6px);
+    border-top:1px solid rgba(0,0,0,.05);
+    pointer-events:none;
+    z-index:10;
+  }
 
-.message { font-size: 1.1rem; margin-top: 1rem; }
+  /* Critters layer */
+  .stage{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:30;
+  }
 
-/* Mood */
-.mood-buttons button {
-  margin: 0.4rem;
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  background: var(--pink);
-  color: white;
-  font-weight: 600;
-}
+  .critter{
+    position:absolute;
+    width:86px;height:62px;
+    pointer-events:auto;
+    cursor:pointer;
+    transform:translate(-50%,-50%);
+    will-change:transform,left,top;
+  }
 
-.response { margin-top: 1rem; font-style: italic; }
+  /* speech bubble */
+  .bubble{
+    position:absolute;
+    left:50%;
+    bottom:62px;
+    transform:translateX(-50%);
+    background:#fff;
+    padding:6px 10px;
+    border-radius:999px;
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+    font-size:12px;
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity .2s;
+    pointer-events:none;
+  }
+  .bubble::after{
+    content:"";
+    position:absolute; left:50%; bottom:-6px;
+    width:12px;height:12px;
+    background:#fff;
+    transform:translateX(-50%) rotate(45deg);
+  }
+  .bubble.show{opacity:1}
 
-/* Bucket list */
-.bucket-input {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
+  /* sleep Zzz */
+  .zzz{
+    position:absolute; left:60px; top:-8px;
+    font-weight:900;
+    color:rgba(75,44,44,.65);
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .2s, transform .2s;
+    pointer-events:none;
+  }
+  .sleeping .zzz{opacity:1; transform:translateY(0px)}
 
-.bucket-input input {
-  flex: 1;
-  padding: 0.6rem;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
+  /* tiny hearts when clicked */
+  .heart{
+    position:absolute;
+    font-size:16px;
+    will-change:transform,opacity;
+    pointer-events:none;
+  }
 
-.bucket-input button {
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  border: none;
-  background: var(--pink);
-  color: white;
-  cursor: pointer;
-}
+  footer{
+    position:fixed; left:0; right:0; bottom:0;
+    padding:14px 10px;
+    text-align:center;
+    background:rgba(255,255,255,.82);
+    border-top:1px solid rgba(0,0,0,.06);
+    z-index:20;
+  }
 
-ul { list-style: none; padding: 0; }
-
-li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--soft-pink);
-  padding: 0.6rem 1rem;
-  border-radius: 12px;
-  margin-bottom: 0.5rem;
-}
-
-li span.done {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
-
-/* Cats */
-.cat {
-  position: fixed;
-  bottom: 20px;
-  width: 60px;
-  cursor: pointer;
-  z-index: 50;
-  transition: transform 0.4s;
-}
-
-.cat.sleeping {
-  transform: scale(0.95);
-  filter: grayscale(20%);
-}
-
-/* Chat bubble */
-.bubble {
-  position: absolute;
-  bottom: 70px;
-  left: -10px;
-  background: white;
-  padding: 0.4rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-}
-
-.bubble.show { opacity: 1; }
-
-/* Fish */
-.fish {
-  position: fixed;
-  top: 30%;
-  width: 50px;
-  cursor: pointer;
-  animation: float 4s ease-in-out infinite;
-  z-index: 40;
-}
-
-@keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-}
-
-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  padding: 0.8rem;
-  background: rgba(255,255,255,0.85);
-  font-size: 0.85rem;
-}
+  /* Reduce motion support */
+  @media (prefers-reduced-motion: reduce){
+    .card::after{display:none}
+  }
 </style>
 </head>
 
 <body>
-
-<div class="container">
-  <div class="card hero">
-    <h1>Hey Soumya 💕</h1>
-    <div class="message" id="dailyMessage"></div>
-  </div>
-
-  <div class="card">
-    <h2>How are you cutiee? 🥰</h2>
-    <div class="mood-buttons">
-      <button onclick="respond('happy')">Happy 😊</button>
-      <button onclick="respond('sad')">Sad 🥺</button>
-      <button onclick="respond('tired')">Tired 😴</button>
-      <button onclick="respond('excited')">Excited ✨</button>
+  <div class="container">
+    <div class="card hero" id="heroCard">
+      <h1>Hey Soumya 💞</h1>
+      <div class="sub" id="dailyMessage"></div>
+      <div style="margin-top:10px;font-size:13px;opacity:.75">
+        (psst… cats wander around and react to what you do)
+      </div>
     </div>
-    <div class="response" id="moodResponse"></div>
-  </div>
 
-  <div class="card">
-    <h2>Our Cute Bucket List 🐾</h2>
-    <div class="bucket-input">
-      <input id="bucketInput" placeholder="Add something sweet..." />
-      <button onclick="addBucket()">Add</button>
+    <div class="card" id="moodCard">
+      <h2>How are you cutiee? 🥰</h2>
+      <div class="mood-row">
+        <button class="pill" data-mood="happy">Happy 😊</button>
+        <button class="pill" data-mood="sad">Sad 🥺</button>
+        <button class="pill" data-mood="tired">Tired 😴</button>
+        <button class="pill" data-mood="excited">Excited ✨</button>
+      </div>
+      <div class="reply" id="moodReply"></div>
     </div>
-    <ul id="bucketList"></ul>
+
+    <div class="card" id="bucketCard">
+      <h2>Our Cute Bucket List 🐾</h2>
+      <div class="bucket-input">
+        <input id="bucketInput" placeholder="Add something sweet…" />
+        <button id="bucketAdd">Add</button>
+      </div>
+      <ul id="bucketList"></ul>
+    </div>
   </div>
-</div>
 
-<!-- Cats -->
-<div class="cat" id="cat1">
-  <img src="https://i.imgur.com/QZ7QZ9p.png" width="60">
-  <div class="bubble"></div>
-</div>
-
-<div class="cat" id="cat2">
-  <img src="https://i.imgur.com/1X7qZQp.png" width="60">
-  <div class="bubble"></div>
-</div>
-
-<img src="https://i.imgur.com/6YVYF5Y.png" class="fish" id="fish" />
-
-<footer>Made with love 💗</footer>
+  <div class="water"></div>
+  <div class="stage" id="stage"></div>
 
 <script>
-/* Daily message */
+/* ---------------------------
+   Helpers
+---------------------------- */
+const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+const rand = (a,b)=>a+Math.random()*(b-a);
+const pick = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+const now = ()=>performance.now();
+
+/* ---------------------------
+   Romantic daily message (stable per day)
+---------------------------- */
 const messages = [
-  "You make the world softer just by existing 💕",
+  "You make the world softer just by existing 💖",
   "If smiles were stars, you’d be a galaxy ✨",
-  "Hey Soumya, today looks better because of you 🌸",
-  "You are deeply cherished 💖",
-  "A cat smiled thinking of you 🐱"
+  "Today is prettier because you’re in it 🌸",
+  "Tiny reminder: you are deeply cherished 💞",
+  "A cat somewhere is purring because of you 🐾",
+  "You + cozy moments = perfect combo 🍓"
 ];
 
-const today = new Date().toDateString();
-const storedMsg = JSON.parse(localStorage.getItem("dailyMessage") || "{}");
-
-if (storedMsg.date !== today) {
-  localStorage.setItem("dailyMessage", JSON.stringify({
-    date: today,
-    text: messages[Math.floor(Math.random() * messages.length)]
-  }));
+const todayKey = new Date().toISOString().slice(0,10);
+const msgStoreKey = "soumya_daily_msg";
+let stored = JSON.parse(localStorage.getItem(msgStoreKey) || "null");
+if (!stored || stored.day !== todayKey){
+  stored = { day: todayKey, text: pick(messages) };
+  localStorage.setItem(msgStoreKey, JSON.stringify(stored));
 }
+document.getElementById("dailyMessage").textContent = stored.text;
 
-document.getElementById("dailyMessage").textContent =
-  JSON.parse(localStorage.getItem("dailyMessage")).text;
-
-/* Mood */
-function respond(mood) {
-  const map = {
-    happy: "That smile is adorable 💫",
-    sad: "Soft hugs for you 🤍",
-    tired: "Rest a bit, sweet soul 🌙",
-    excited: "Your joy is glowing ✨"
-  };
-  document.getElementById("moodResponse").textContent = map[mood];
-}
-
-/* Bucket list persistence */
-const bucketList = document.getElementById("bucketList");
-
-function saveBuckets() {
-  const data = [...bucketList.children].map(li => ({
-    text: li.querySelector("span").textContent,
-    done: li.querySelector("span").classList.contains("done")
-  }));
-  localStorage.setItem("bucketList", JSON.stringify(data));
-}
-
-function loadBuckets() {
-  const data = JSON.parse(localStorage.getItem("bucketList") || "[]");
-  data.forEach(item => {
-    createBucket(item.text, item.done);
+/* ---------------------------
+   Mood interactions
+---------------------------- */
+const moodMap = {
+  happy: "That smile is adorable. I’m proud of you 💫",
+  sad: "Come here. Soft hug. Slow breaths. You’re safe 🤍",
+  tired: "Rest a little, sweetheart. Even stars need breaks 🌙",
+  excited: "Your excitement is glowing. Tell me more ✨"
+};
+document.querySelectorAll(".pill").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.getElementById("moodReply").textContent = moodMap[btn.dataset.mood] || "";
+    // cats react when you press mood buttons
+    critters.forEach(c=>c.notice("mood"));
   });
+});
+
+/* ---------------------------
+   Bucket list + localStorage (persist)
+---------------------------- */
+const bucketKey = "soumya_bucketlist_v1";
+const bucketList = document.getElementById("bucketList");
+const bucketInput = document.getElementById("bucketInput");
+const bucketAdd = document.getElementById("bucketAdd");
+
+function saveBuckets(){
+  const data = [...bucketList.children].map(li=>({
+    text: li.querySelector(".txt").textContent,
+    done: li.classList.contains("done")
+  }));
+  localStorage.setItem(bucketKey, JSON.stringify(data));
 }
 
-function createBucket(text, done=false) {
+function renderBucketItem(text, done=false){
   const li = document.createElement("li");
-  const span = document.createElement("span");
+  if (done) li.classList.add("done");
+
+  const left = document.createElement("div");
+  left.className = "left";
+
+  const chk = document.createElement("div");
+  chk.className = "chk";
+  chk.innerHTML = done ? "✓" : "";
+  chk.addEventListener("click", ()=>{
+    li.classList.toggle("done");
+    chk.innerHTML = li.classList.contains("done") ? "✓" : "";
+    saveBuckets();
+    // critters celebrate
+    spawnHearts(li.getBoundingClientRect().left + 40, li.getBoundingClientRect().top + 10, 6);
+    critters.forEach(c=>c.notice("bucket"));
+  });
+
+  const span = document.createElement("div");
+  span.className = "txt";
   span.textContent = text;
-  if (done) span.classList.add("done");
 
-  const controls = document.createElement("div");
+  left.append(chk, span);
 
-  const ok = document.createElement("button");
-  ok.textContent = "✔";
-  ok.onclick = () => { span.classList.toggle("done"); saveBuckets(); };
+  const actions = document.createElement("div");
+  actions.className = "actions";
 
   const del = document.createElement("button");
+  del.className = "mini";
   del.textContent = "✖";
-  del.onclick = () => { li.remove(); saveBuckets(); };
+  del.addEventListener("click", ()=>{
+    li.remove();
+    saveBuckets();
+  });
 
-  controls.append(ok, del);
-  li.append(span, controls);
+  actions.append(del);
+
+  li.append(left, actions);
   bucketList.appendChild(li);
 }
 
-function addBucket() {
-  const input = document.getElementById("bucketInput");
-  if (!input.value.trim()) return;
-  createBucket(input.value);
-  input.value = "";
-  saveBuckets();
+function loadBuckets(){
+  const data = JSON.parse(localStorage.getItem(bucketKey) || "[]");
+  data.forEach(it=>renderBucketItem(it.text, it.done));
 }
-
 loadBuckets();
 
-/* Cat logic */
-const catPhrases = [
-  "meow 💕",
-  "hi Soumya 🐾",
-  "nap time?",
-  "you’re loved",
-  "purr..."
-];
+function addBucket(){
+  const v = bucketInput.value.trim();
+  if (!v) return;
+  renderBucketItem(v, false);
+  bucketInput.value = "";
+  saveBuckets();
+  // cute feedback
+  spawnHearts(window.innerWidth*0.5, window.innerHeight*0.65, 10);
+  critters.forEach(c=>c.speak("Added to the list! 🐾"));
+}
+bucketAdd.addEventListener("click", addBucket);
+bucketInput.addEventListener("keydown",(e)=>{ if(e.key==="Enter") addBucket(); });
 
-document.querySelectorAll(".cat").forEach(cat => {
-  let x = Math.random() * (window.innerWidth - 60);
-  let sleeping = false;
-
-  cat.style.left = x + "px";
-
-  const bubble = cat.querySelector(".bubble");
-
-  function speak() {
-    bubble.textContent = catPhrases[Math.floor(Math.random() * catPhrases.length)];
-    bubble.classList.add("show");
-    setTimeout(() => bubble.classList.remove("show"), 2000);
-  }
-
-  function sleepCycle() {
-    sleeping = true;
-    cat.classList.add("sleeping");
-    speak();
-    setTimeout(() => {
-      sleeping = false;
-      cat.classList.remove("sleeping");
-      speak();
-    }, 5000 + Math.random() * 5000);
-  }
-
-  setInterval(() => {
-    if (sleeping) return;
-    x += (Math.random() > 0.5 ? 1 : -1) * 80;
-    x = Math.max(0, Math.min(window.innerWidth - 60, x));
-    cat.style.left = x + "px";
-    if (Math.random() > 0.7) speak();
-    if (Math.random() > 0.85) sleepCycle();
-  }, 3000);
-
-  cat.onclick = () => {
-    sleeping = false;
-    cat.classList.remove("sleeping");
-    speak();
-  };
+/* ---------------------------
+   Card glow follows mouse (better UX)
+---------------------------- */
+document.querySelectorAll(".card").forEach(card=>{
+  card.addEventListener("mousemove",(e)=>{
+    const r = card.getBoundingClientRect();
+    const mx = ((e.clientX - r.left)/r.width)*100;
+    const my = ((e.clientY - r.top)/r.height)*100;
+    card.style.setProperty("--mx", mx+"%");
+    card.style.setProperty("--my", my+"%");
+  });
 });
 
-/* Fish */
-const fish = document.getElementById("fish");
-fish.onclick = () => alert("Blub blub 🐟");
-</script>
+/* ---------------------------
+   Inline SVG sprites (no external images)
+---------------------------- */
+function catSVG(color="#ffb6c1"){
+  return `
+  <svg viewBox="0 0 160 110" width="86" height="62" aria-hidden="true">
+    <defs>
+      <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".2"/>
+      </filter>
+    </defs>
+    <g filter="url(#s)">
+      <ellipse cx="82" cy="74" rx="54" ry="26" fill="${color}"/>
+      <circle cx="52" cy="52" r="22" fill="${color}"/>
+      <polygon points="37,42 28,25 46,34" fill="${color}"/>
+      <polygon points="67,42 76,25 58,34" fill="${color}"/>
+      <circle class="eyeL" cx="46" cy="52" r="3.2" fill="#2e1a1a"/>
+      <circle class="eyeR" cx="58" cy="52" r="3.2" fill="#2e1a1a"/>
+      <path d="M49 58 Q52 61 55 58" stroke="#2e1a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="52" cy="56" r="2.3" fill="#ff7aa2"/>
+      <path d="M30 58 L18 56" stroke="#2e1a1a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M30 62 L18 64" stroke="#2e1a1a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M74 58 L86 56" stroke="#2e1a1a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M74 62 L86 64" stroke="#2e1a1a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M118 66 Q150 76 138 92" stroke="${color}" stroke-width="12" fill="none" stroke-linecap="round"/>
+      <circle cx="62" cy="86" r="8" fill="${color}"/>
+      <circle cx="84" cy="90" r="8" fill="${color}"/>
+      <circle cx="104" cy="86" r="8" fill="${color}"/>
+    </g>
+  </svg>`;
+}
 
+function fishSVG(){
+  // orange guppy-ish silhouette
+  return `
+  <svg viewBox="0 0 170 110" width="86" height="62" aria-hidden="true">
+    <defs>
+      <filter id="fs" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".2"/>
+      </filter>
+      <linearGradient id="og" x1="0" x2="1">
+        <stop offset="0" stop-color="#ffb347"/>
+        <stop offset="1" stop-color="#ff7a1a"/>
+      </linearGradient>
+    </defs>
+    <g filter="url(#fs)">
+      <path d="M62 55 C75 30, 115 30, 126 55 C115 80, 75 80, 62 55 Z" fill="url(#og)"/>
+      <path d="M126 55 L155 35 L148 55 L155 75 Z" fill="#ff8a2a"/>
+      <circle cx="78" cy="50" r="4" fill="#2e1a1a"/>
+      <circle cx="79.5" cy="48.5" r="1.3" fill="#fff"/>
+      <path d="M70 61 Q80 68 92 61" stroke="#c94d00" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M92 38 Q103 30 110 38" fill="rgba(255,255,255,.35)"/>
+      <path d="M95 72 Q105 85 120 72" fill="rgba(255,255,255,.25)"/>
+    </g>
+  </svg>`;
+}
+
+/* ---------------------------
+   Critter AI (interaction-heavy but stable)
+   - Cats wander, target cards, sleep, chat, react
+   - Fish swims in water band; sometimes chases cursor
+---------------------------- */
+const stage = document.getElementById("stage");
+const cards = [
+  document.getElementById("heroCard"),
+  document.getElementById("moodCard"),
+  document.getElementById("bucketCard")
+];
+
+const catPhrases = [
+  "hi Soumya 🐾",
+  "purr…",
+  "you’re loved 💖",
+  "tiny hug?",
+  "nap time 😴",
+  "look! a heart 💞"
+];
+
+class Critter {
+  constructor(kind, opts={}){
+    this.kind = kind; // "cat" | "fish"
+    this.el = document.createElement("div");
+    this.el.className = "critter";
+    this.el.innerHTML = `
+      <div class="bubble"></div>
+      <div class="zzz">Zzz</div>
+      ${kind==="cat" ? catSVG(opts.color) : fishSVG()}
+    `;
+    stage.appendChild(this.el);
+
+    this.bubble = this.el.querySelector(".bubble");
+    this.zzz = this.el.querySelector(".zzz");
+
+    this.x = rand(120, window.innerWidth-120);
+    this.y = kind==="fish" ? window.innerHeight - rand(90, 145) : window.innerHeight - rand(180, 240);
+    this.vx = rand(-40, 40);
+    this.vy = rand(-10, 10);
+
+    this.state = "wander"; // wander | target | sleep
+    this.stateUntil = now() + rand(1500, 4000);
+    this.target = null;
+
+    this.face = 1;
+    this.lastSpeak = 0;
+
+    this.el.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      this.wake();
+      this.speak(pick(catPhrases));
+      spawnHearts(this.x, this.y-40, 10);
+      this.notice("click");
+    });
+
+    // start position
+    this.render();
+  }
+
+  speak(text){
+    this.bubble.textContent = text;
+    this.bubble.classList.add("show");
+    clearTimeout(this._bubbleT);
+    this._bubbleT = setTimeout(()=>this.bubble.classList.remove("show"), 2000);
+  }
+
+  wake(){
+    if (this.state === "sleep"){
+      this.state = "wander";
+      this.el.classList.remove("sleeping");
+      this.stateUntil = now() + rand(1200, 3000);
+    }
+  }
+
+  notice(event){
+    if (this.kind !== "cat") return;
+    // Small behavioral nudges
+    if (event === "bucket"){
+      if (Math.random() < 0.6) this.speak("yay! 🐾");
+    } else if (event === "mood"){
+      if (Math.random() < 0.5) this.speak("I’m listening 💞");
+    } else if (event === "click"){
+      // already handled
+    }
+  }
+
+  chooseTarget(){
+    const c = pick(cards);
+    const r = c.getBoundingClientRect();
+    // walk near bottom edge of card
+    this.target = {
+      x: clamp(r.left + rand(40, r.width-40), 80, window.innerWidth-80),
+      y: clamp(r.top + r.height + rand(40, 80), 140, window.innerHeight-220)
+    };
+    this.state = "target";
+    this.stateUntil = now() + rand(2200, 4200);
+  }
+
+  maybeSleep(){
+    if (this.kind !== "cat") return;
+    if (Math.random() < 0.12){
+      this.state = "sleep";
+      this.stateUntil = now() + rand(3800, 7800);
+      this.el.classList.add("sleeping");
+      this.speak("nap… 😴");
+    }
+  }
+
+  tick(dt, cursor){
+    // fish constrained to water band
+    if (this.kind === "fish"){
+      const minY = window.innerHeight - 160;
+      const maxY = window.innerHeight - 80;
+
+      // sometimes chase cursor within water band
+      if (cursor && cursor.active && Math.random() < 0.003){
+        this.state = "target";
+        this.target = {
+          x: clamp(cursor.x, 60, window.innerWidth-60),
+          y: clamp(cursor.y, minY, maxY)
+        };
+        this.stateUntil = now() + rand(900, 1400);
+      }
+
+      // normal swim
+      if (this.state === "wander"){
+        this.vx += rand(-10, 10);
+        this.vx = clamp(this.vx, -80, 80);
+        this.x += this.vx * (dt/1000);
+        this.y += Math.sin(now()/600) * 0.25;
+
+        if (this.x < 60){ this.x = 60; this.vx = Math.abs(this.vx); }
+        if (this.x > window.innerWidth-60){ this.x = window.innerWidth-60; this.vx = -Math.abs(this.vx); }
+        this.y = clamp(this.y, minY, maxY);
+
+      } else if (this.state === "target" && this.target){
+        const dx = this.target.x - this.x;
+        const dy = this.target.y - this.y;
+        const d = Math.hypot(dx,dy) || 1;
+        const speed = 170;
+        this.x += (dx/d) * speed * (dt/1000);
+        this.y += (dy/d) * speed * (dt/1000);
+      }
+
+      if (now() > this.stateUntil){
+        this.state = "wander";
+        this.target = null;
+        this.stateUntil = now() + rand(1400, 3200);
+      }
+
+      this.face = this.vx >= 0 ? 1 : -1;
+      this.render(true);
+      return;
+    }
+
+    // Cats
+    if (this.state === "sleep"){
+      // occasional zzz bubbles
+      if (now() - this.lastSpeak > 2500 && Math.random()<0.15){
+        this.speak("Zzz…");
+        this.lastSpeak = now();
+      }
+      if (now() > this.stateUntil){
+        this.el.classList.remove("sleeping");
+        this.state = "wander";
+        this.stateUntil = now() + rand(1200, 2600);
+        this.speak("awake 🐾");
+      }
+      this.render();
+      return;
+    }
+
+    if (this.state === "wander"){
+      // drift
+      this.vx += rand(-18, 18);
+      this.vx = clamp(this.vx, -120, 120);
+
+      this.x += this.vx * (dt/1000);
+      // keep cats near bottom
+      const minY = window.innerHeight - 260;
+      const maxY = window.innerHeight - 180;
+      this.y = clamp(this.y + this.vy*(dt/1000), minY, maxY);
+
+      if (this.x < 60){ this.x = 60; this.vx = Math.abs(this.vx); }
+      if (this.x > window.innerWidth-60){ this.x = window.innerWidth-60; this.vx = -Math.abs(this.vx); }
+
+      // occasionally chat/target/sleep
+      if (now() > this.stateUntil){
+        if (Math.random() < 0.45) this.chooseTarget();
+        else {
+          if (Math.random() < 0.55) this.speak(pick(catPhrases));
+          this.maybeSleep();
+          this.stateUntil = now() + rand(1600, 3600);
+        }
+      }
+
+    } else if (this.state === "target" && this.target){
+      const dx = this.target.x - this.x;
+      const dy = this.target.y - this.y;
+      const d = Math.hypot(dx,dy) || 1;
+      const speed = 220;
+      this.x += (dx/d) * speed * (dt/1000);
+      this.y += (dy/d) * speed * (dt/1000);
+
+      // arrive -> sniff / chat then wander
+      if (d < 18){
+        if (Math.random()<0.6) this.speak("sniff…");
+        this.state = "wander";
+        this.target = null;
+        this.stateUntil = now() + rand(1400, 3200);
+        // sometimes sleep after reaching a card
+        this.maybeSleep();
+      }
+    }
+
+    this.face = this.vx >= 0 ? 1 : -1;
+    this.render();
+  }
+
+  render(isFish=false){
+    // flip direction
+    this.el.style.left = this.x + "px";
+    this.el.style.top = this.y + "px";
+    const flip = `scaleX(${this.face})`;
+    // fish slightly tilted with speed
+    const tilt = isFish ? ` rotate(${clamp(this.vx/12,-12,12)}deg)` : "";
+    this.el.style.transform = `translate(-50%,-50%) ${flip}${tilt}`;
+  }
+
+  destroy(){
+    this.el.remove();
+  }
+}
+
+const critters = [
+  new Critter("cat",{color:"#ffb6c1"}),
+  new Critter("cat",{color:"#ffd1a8"}),
+  new Critter("fish")
+];
+
+/* mouse cursor state (for fish chase) */
+const cursor = {x: window.innerWidth/2, y: window.innerHeight/2, active:false};
+window.addEventListener("mousemove",(e)=>{cursor.x=e.clientX;cursor.y=e.clientY;cursor.active=true;});
+window.addEventListener("mouseleave",()=>{cursor.active=false;});
+
+/* cats react to scroll */
+let scrollT=0;
+window.addEventListener("scroll", ()=>{
+  scrollT = now();
+  critters.forEach(c=>{
+    if (c.kind==="cat"){
+      c.wake();
+      if (Math.random()<0.6) c.speak("whoosh!");
+    }
+  });
+});
+
+/* ---------------------------
+   Hearts / micro-celebrations
+---------------------------- */
+function spawnHearts(x,y,n=8){
+  const stageRect = stage.getBoundingClientRect();
+  const sx = x - stageRect.left;
+  const sy = y - stageRect.top;
+
+  for(let i=0;i<n;i++){
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.textContent = pick(["💗","💞","💕","💘","💓"]);
+    h.style.left = sx + "px";
+    h.style.top = sy + "px";
+    stage.appendChild(h);
+
+    const dx = rand(-60,60);
+    const dy = rand(-120,-40);
+    const rot = rand(-25,25);
+    const t0 = now();
+    const dur = rand(700,1100);
+
+    const tick = ()=>{
+      const t = now()-t0;
+      const p = clamp(t/dur,0,1);
+      h.style.transform = `translate(${dx*p}px, ${dy*p}px) rotate(${rot*p}deg) scale(${1 + 0.3*p})`;
+      h.style.opacity = (1-p);
+      if (p<1) requestAnimationFrame(tick);
+      else h.remove();
+    };
+    requestAnimationFrame(tick);
+  }
+}
+
+/* ---------------------------
+   Main loop (stable RAF)
+---------------------------- */
+let last = now();
+function loop(){
+  const t = now();
+  const dt = t - last;
+  last = t;
+  critters.forEach(c=>c.tick(dt, cursor));
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* keep critters in bounds on resize */
+window.addEventListener("resize", ()=>{
+  critters.forEach(c=>{
+    c.x = clamp(c.x, 70, window.innerWidth-70);
+    c.y = clamp(c.y, 120, window.innerHeight-80);
+  });
+});
+</script>
 </body>
 </html>
