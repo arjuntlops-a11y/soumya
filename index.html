@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>For Soumya 💖</title>
 
+<!-- Supabase SDK (global = supabase) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -21,14 +22,12 @@ body {
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
   color:var(--ink);
-  overflow-x:hidden;
 }
 
-/* UI */
 .container {
   max-width:900px;
   margin:auto;
-  padding:24px 14px 160px;
+  padding:24px 14px 140px;
 }
 
 .card {
@@ -39,9 +38,9 @@ body {
   margin:16px 0;
 }
 
-.hero { text-align:center }
+.hero { text-align:center; }
 
-h1,h2 { margin:.4rem 0 }
+h1,h2 { margin:.4rem 0; }
 
 .mood-row {
   display:flex;
@@ -112,14 +111,14 @@ li {
 .cat {
   position:fixed;
   bottom:20px;
-  font-size:48px;
+  font-size:44px;
   cursor:pointer;
   user-select:none;
 }
 
 .cat .bubble {
   position:absolute;
-  bottom:60px;
+  bottom:56px;
   left:50%;
   transform:translateX(-50%);
   background:#fff;
@@ -132,7 +131,7 @@ li {
   white-space:nowrap;
 }
 
-.cat .bubble.show { opacity:1 }
+.cat .bubble.show { opacity:1; }
 
 footer {
   position:fixed;
@@ -196,18 +195,19 @@ footer {
 const SUPABASE_URL = "https://vzzwibveqcgyblyuaztv.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6endpYnZlcWNneWJseXVhenR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTc3MDUsImV4cCI6MjA4Mzg5MzcwNX0.BVTm-pYfEJQ0XGgaEcFDHRUb4CSvJmsPon3UGAcqwPY";
 
-const supabase = supabase.createClient(
+/* IMPORTANT: client name is NOT 'supabase' */
+const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-/* Log visit */
-supabase.from("events").insert({
-  event_type:"visit",
-  value:"open"
+/* ================= VISIT LOG ================= */
+supabaseClient.from("events").insert({
+  event_type: "visit",
+  value: "open"
 });
 
-/* Daily message */
+/* ================= DAILY MESSAGE ================= */
 const messages = [
   "You make the world softer just by existing 💖",
   "If smiles were stars, you’d be a galaxy ✨",
@@ -217,34 +217,35 @@ const messages = [
 document.getElementById("dailyMessage").textContent =
   messages[Math.floor(Math.random()*messages.length)];
 
-/* Moods */
+/* ================= MOODS ================= */
 const moodReply = {
-  happy:"That smile is adorable 💫",
-  sad:"Soft hugs for you 🤍",
-  tired:"Rest a little, sweetheart 🌙",
-  excited:"Your joy is glowing ✨"
+  happy: "That smile is adorable 💫",
+  sad: "Soft hugs for you 🤍",
+  tired: "Rest a little, sweetheart 🌙",
+  excited: "Your joy is glowing ✨"
 };
 
-document.querySelectorAll(".pill").forEach(btn=>{
-  btn.onclick = ()=>{
+document.querySelectorAll(".pill").forEach(btn => {
+  btn.onclick = () => {
     const mood = btn.dataset.mood;
     document.getElementById("moodReply").textContent = moodReply[mood];
-    supabase.from("events").insert({
-      event_type:"mood",
-      value:mood
+    supabaseClient.from("events").insert({
+      event_type: "mood",
+      value: mood
     });
   };
 });
 
-/* Bucket list */
+/* ================= BUCKET LIST ================= */
 const list = document.getElementById("bucketList");
-document.getElementById("bucketAdd").onclick = async ()=>{
+
+document.getElementById("bucketAdd").onclick = async () => {
   const input = document.getElementById("bucketInput");
   const text = input.value.trim();
-  if(!text) return;
+  if (!text) return;
   input.value = "";
 
-  const { data } = await supabase
+  const { data } = await supabaseClient
     .from("bucket_items")
     .insert({ text, done:false })
     .select()
@@ -258,30 +259,33 @@ document.getElementById("bucketAdd").onclick = async ()=>{
       <button>✖</button>
     </div>
   `;
-  li.children[1].children[0].onclick = ()=>{
+
+  li.children[1].children[0].onclick = () => {
     li.classList.toggle("done");
-    supabase.from("bucket_items")
+    supabaseClient
+      .from("bucket_items")
       .update({ done: li.classList.contains("done") })
       .eq("id", data.id);
   };
-  li.children[1].children[1].onclick = ()=>{
+
+  li.children[1].children[1].onclick = () => {
     li.remove();
-    supabase.from("bucket_items").delete().eq("id", data.id);
+    supabaseClient.from("bucket_items").delete().eq("id", data.id);
   };
+
   list.appendChild(li);
 };
 
-/* Cats */
-document.querySelectorAll(".cat").forEach(cat=>{
-  cat.onclick = ()=>{
+/* ================= CATS ================= */
+document.querySelectorAll(".cat").forEach(cat => {
+  cat.onclick = () => {
     const bubble = cat.querySelector(".bubble");
     bubble.classList.add("show");
-    setTimeout(()=>bubble.classList.remove("show"),2000);
+    setTimeout(() => bubble.classList.remove("show"), 2000);
   };
 
-  setInterval(()=>{
-    let x = Math.random() * (window.innerWidth - 60);
-    cat.style.left = x + "px";
+  setInterval(() => {
+    cat.style.left = Math.random() * (window.innerWidth - 60) + "px";
   }, 3000);
 });
 </script>
