@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Click Test</title>
+</head>
+<body>
+
+<button id="btn">CLICK ME</button>
+<input id="inp" placeholder="type here">
+
+<script>
+  console.log("JS LOADED");
+
+  document.getElementById("btn").onclick = () => {
+    alert("BUTTON CLICKED");
+  };
+
+  document.getElementById("inp").oninput = () => {
+    console.log("TYPING");
+  };
+</script>
+
+</body>
+</html>
